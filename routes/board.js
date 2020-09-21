@@ -2,8 +2,10 @@ var express = require('express');
 var router = express.Router();
 var dbc = require('../config/database')();
 var connection = dbc.init();
+var sens = require('node-sens');
 
 dbc.test_open(connection);
+
 
 //글 목록
 router.get('/info', function (req, res, next) {
@@ -75,8 +77,26 @@ router.get('/login', function (req, res, next) {
 });
 
 //글 쓰기 페이지
-router.get('/write', function (req, res, next) {
-   
+ router.get('/sms', function (req, res, next) {
+    let phonenum = req.query['phonenum'];
+    let authnum = "";
+    for (i = 0; i < 6; i++) {
+        authnum += parseInt(Math.random() * 10) 
+    }
+    console.log(phonenum);
+    console.log(authnum);
+    const ncp = new sens.NCPClient({
+        phoneNumber: phonenum,
+        serviceId: 'ncp:sms:kr:260698668059:farmdesign',
+        secretKey: 'n8sRxOwu2PehTBtCKpN6iD0JokLPqhb906kBfn6d',
+        accessKey: 'NoQXH1GDPUBkbCFdlZEa',
+    })
+    const { success, msg, status } = ncp.sendSMS({
+        to: phonenum,
+        content: '[한우팡] 인증번호 [' + authnum + ']를 입력해주세요.',
+        countryCode: '82',
+      });
+    res.send(authnum); // 어플로 수신번호 보내기  인증 확인 위해서   
 });
 
 //글 쓰기 처리
