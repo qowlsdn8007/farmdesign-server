@@ -96,6 +96,7 @@ router.get('/login', function (req, res, next) {
         content: '[한우팡] 인증번호 [' + authnum + ']를 입력해주세요.',
         countryCode: '82',
       });
+    console.log(ncp.success);
     res.send(authnum); // 어플로 수신번호 보내기  인증 확인 위해서   
 });
 
