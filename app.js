@@ -9,7 +9,7 @@ var usersRouter = require('./routes/users');
 
 //게시판 라우터 추가 **************
 var boardRouter = require('./routes/board');
-
+var port = 3000;
 var app = express();
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -45,6 +45,8 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-
+app.listen(port, () => {
+    console.log("listening success!")
+});
 
 module.exports = app;
