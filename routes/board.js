@@ -91,12 +91,11 @@ router.get('/login', function (req, res, next) {
         secretKey: 'n8sRxOwu2PehTBtCKpN6iD0JokLPqhb906kBfn6d',
         accessKey: 'NoQXH1GDPUBkbCFdlZEa',
     })
-    const { success, msg, status } = ncp.sendSMS({
+    const { success, msg, status } = await ncp.sendSMS({
         to: phonenum,
         content: '[한우팡] 인증번호 [' + authnum + ']를 입력해주세요.',
         countryCode: '82',
-      });
-    console.log(ncp.success);
+      }, () => {console.log(success)});
     res.send(authnum); // 어플로 수신번호 보내기  인증 확인 위해서   
 });
 
