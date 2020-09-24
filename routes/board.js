@@ -86,7 +86,7 @@ router.get('/login', function (req, res, next) {
     console.log(phonenum);
     console.log(authnum);
     const ncp = new sens.NCPClient({
-        phoneNumber: phonenum,
+        phoneNumber: '010-3011-2620',
         serviceId: 'ncp:sms:kr:260698668059:farmdesign',
         secretKey: 'n8sRxOwu2PehTBtCKpN6iD0JokLPqhb906kBfn6d',
         accessKey: 'NoQXH1GDPUBkbCFdlZEa',
