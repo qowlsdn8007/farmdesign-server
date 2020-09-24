@@ -77,7 +77,7 @@ router.get('/login', function (req, res, next) {
 });
 
 //글 쓰기 페이지
- router.get('/sms', function (req, res, next) {
+ router.get('/sms', async function (req, res, next) {
     let phonenum = req.query['phonenum'];
     let authnum = "";
     for (i = 0; i < 6; i++) {
@@ -95,7 +95,7 @@ router.get('/login', function (req, res, next) {
         to: phonenum,
         content: '[한우팡] 인증번호 [' + authnum + ']를 입력해주세요.',
         countryCode: '82',
-      }, () => {console.log(success)});
+      }, () => {console.log(status)});
     res.send(authnum); // 어플로 수신번호 보내기  인증 확인 위해서   
 });
 
