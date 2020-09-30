@@ -53,7 +53,7 @@ router.get('/info', function (req, res, next) {
         }
     })*/
     //if (flag === "ok") {
-        let sql = "INSERT INTO farm_info (FARM_NM, USER_ID, PASSWD, CITY_NM, FARM_ADDR, token) VALUES ?";
+        let sql = "INSERT INTO farm_info (FARM_NM, USER_ID, PASSWD, CITY_NM, FARM_ADDR) VALUES ?";
         connection.query(sql, [input], function (error, rows, fields) {
             if (!error) {      
                 console.log(rows);
@@ -84,7 +84,6 @@ router.get('/login', function (req, res, next) {
                         resMyIntro: rows[0]['MyIntro'],
                         resFarmIntro: rows[0]['FarmIntro'],
                         resPhoto: rows[0]['PHOTO'],
-                        resToken: rows[0]['token'],
                  });
             }
             else
@@ -124,27 +123,6 @@ router.post('/upload', upload.single('img'), function (req, res, next) {
     console.log(req);
     res.status(200).json({ imageID: 1});
     console.log(res);
-});
-
-//글 수정 페이지
-router.get('/token', function (req, res, next) {
-    let token = req.query['token'];
-    console.log(farm)
-    let sql = `SELECT * FROM farm_info WHERE token = ?`;
-    connection.query(sql, [token], function (error, rows, fields) {
-        if (!error) {
-            res.send({
-                resName: rows[0]['FARM_NM'],
-                resMyIntro: rows[0]['MyIntro'],
-                resFarmIntro: rows[0]['FarmIntro'],
-                resPhoto: rows[0]['PHOTO'],
-                resToken: rows[0]['token'],
-                resEmail: rows[0]['USER_ID']
-            });     
-        } else {
-            console.log('query error : ' + error);
-        }
-    });
 });
 
 //프로필
