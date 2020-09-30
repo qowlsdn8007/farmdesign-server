@@ -12,6 +12,7 @@ var boardRouter = require('./routes/board');
 var app = express();
 var cors = require('cors');
 var bodyParser = require('body-parser');
+var port = 3000;
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -45,8 +46,8 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-/*app.listen(port, () => {
+app.listen(port, () => {
     console.log("listening success!")
-});*/
+});
 
 module.exports = app;
