@@ -2,20 +2,39 @@ var express = require('express');
 var router = express.Router();
 var dbc = require('../config/database')();
 var connection = dbc.init();
-var sens = require('node-sens');
+const sens = require('node-sens');
+const multer = require('multer');
+const path = require('path');
+const sharp = require('sharp');
 
 dbc.test_open(connection);
+
+const upload = multer({     // 이미지 업로드 폴더에 저장하는 객체 생성
+    storage: multer.diskStorage({
+      // set a localstorage destination
+      destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+      },
+      // convert a file name
+      filename: (req, file, cb) => {
+        cb(null, new Date().valueOf() + path.extname(file.originalname));
+      },
+    }),
+  });
 
 
 //글 목록
 router.get('/info', function (req, res, next) {
     let inputId = req.query['inputId'];
     console.log(inputId);
-    let arr = ['FARM_NM', 'USER_ID', 'PASSWD', 'CITY_NM', 'FARM_ADDR'];
     let inputarr = ['inputNm', 'inputId', 'inputPw', 'inputCityNm', 'inputAddr']
     let input = [];
     for (i = 0; i < 5; i++)
         input[i] = req.query[inputarr[i]];
+    let token = "";
+    for (i = 0; i < 6; i++) 
+        token += parseInt(Math.random() * 10); 
+    input.push(token);
     input = [input];
     console.log(input);
     let flag = " ";
@@ -40,11 +59,11 @@ router.get('/info', function (req, res, next) {
         }
     })*/
     //if (flag === "ok") {
-        let sql = "INSERT INTO farm_info (FARM_NM, USER_ID, PASSWD, CITY_NM, FARM_ADDR) VALUES ?";
+        let sql = "INSERT INTO farm_info (FARM_NM, USER_ID, PASSWD, CITY_NM, FARM_ADDR, token) VALUES ?";
         connection.query(sql, [input], function (error, rows, fields) {
             if (!error) {      
                 console.log(rows);
-                res.send("success");                   
+                res.send(token);                   
             } else {
                 console.log('query error : ' + error);
                 res.send("fail");
@@ -66,7 +85,13 @@ router.get('/login', function (req, res, next) {
                 console.log(rows);
                 console.log(rows[0]['PASSWD']);
                 if (rows[0]['PASSWD'] == inputPw)
-                    res.send('success');
+                    res.send({
+                        resName: rows[0]['FARM_NM'],
+                        resMyIntro: rows[0]['MyIntro'],
+                        resFarmIntro: rows[0]['FarmIntro'],
+                        resPhoto: rows[0]['PHOTO'],
+                        resToken: rows[0]['token'],
+                 });
             }
             else
                 res.send('fail');
@@ -100,40 +125,69 @@ router.get('/login', function (req, res, next) {
 });
 
 //글 쓰기 처리
-router.post('/writeProc', function (req, res, next) {
+router.post('/upload', upload.single('img'), function (req, res, next) {
 
-    const author = req.body.author;
-    const title = req.body.title;
-    const contents = req.body.contents;
-
-    //입력할 데이터를 배열에 담아 준비합니다.
-    var params  = [author, title, contents];
-
-    //T_BOARD에 데이터를 입력합니다. 위에서 만든 params의 순서에 맞게 ? 에 변수가 들어갑니다.
-    //NOW()를 통해 현재 시각을 입력합니다.
-    //var sql = `INSERT INTO T_BOARD (TITLE, AUTHOR, CONTENTS, INPT_DTTM) VALUES (?, ?, ?, NOW())`;
-    var sql = "INSERT INTO DUAL VALUES (?, ?, ?, NOW())";
-    connection.query(sql, params, function (error, rows, fields) {
-        if (!error) {            
-            
-        } else {
-            console.log('query error : ' + error);
-        }
-    }); 
+    console.log(req);
+    res.status(200).json({ imageID: 1});
+    console.log(res);
 });
 
 //글 수정 페이지
-router.get('/update/:id', function (req, res, next) {
-   
+router.get('/token', function (req, res, next) {
+    let token = req.query['token'];
+    console.log(farm)
+    let sql = `SELECT * FROM farm_info WHERE token = ?`;
+    connection.query(sql, [token], function (error, rows, fields) {
+        if (!error) {
+            res.send({
+                resName: rows[0]['FARM_NM'],
+                resMyIntro: rows[0]['MyIntro'],
+                resFarmIntro: rows[0]['FarmIntro'],
+                resPhoto: rows[0]['PHOTO'],
+                resToken: rows[0]['token'],
+                resEmail: rows[0]['USER_ID']
+            });     
+        } else {
+            console.log('query error : ' + error);
+        }
+    });
 });
 
-//글 수정 처리
-router.put('/updateProc', function (req, res, next) {
-    res.send('updateProc');
+//프로필
+router.get('/profile', function (req, res, next) {
+    let email = req.query['email'];
+    console.log(email);
+    let sql = `SELECT * FROM farm_info WHERE USER_ID = ?`;
+    connection.query(sql, [email], function (error, rows, fields) {
+        if(!error) { 
+            console.log(rows[0]['FARM_NM']);
+            res.send({
+                resPhoto: rows[0]['PHOTO'],
+                resName: rows[0]['FARM_NM'],
+                resMyIntro: rows[0]['MyIntro'],
+                resFarmIntro: rows[0]['FarmIntro'],
+            });
+        } else {
+            console.log(error);
+        }        
+    });
 });
-
 //글 삭제 처리
-router.delete('/deleteProc/:id', function (req, res, next) {
+router.get('/getBoardUsers', function (req, res, next) {
+    let sql = `SELECT * FROM farm_Community`;
+    connection.query(sql, function (error, rows, fields) {
+        console.log(rows);
+        res.send(rows);
+    });
+});
+router.get('/getBoardImages', function (req, res, next) {
+    let sql = `SELECT * FROM farm_Community`;
+    connection.query(sql, function (error, rows, fields) {
+        console.log(rows);
+        res.send(rows);
+    });
+});
+router.get('/deleteProc/:id', function (req, res, next) {
     res.send(`board id : ${req.params.id}`);
 });
 

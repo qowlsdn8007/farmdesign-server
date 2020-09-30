@@ -9,7 +9,6 @@ var usersRouter = require('./routes/users');
 
 //게시판 라우터 추가 **************
 var boardRouter = require('./routes/board');
-var port = 3000;
 var app = express();
 var cors = require('cors');
 var bodyParser = require('body-parser');
@@ -24,6 +23,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors()); // api 위에서 cors 사용,  같은 로컬이여도 송신 가능
 app.use(bodyParser.json()); // request 받는 http body 값을 읽을 수 있게 해줌
+app.use(express.static('uploads')); // uploads 폴더의 파일 정적으로 사용 가능
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
@@ -45,8 +45,8 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-app.listen(port, () => {
+/*app.listen(port, () => {
     console.log("listening success!")
-});
+});*/
 
 module.exports = app;
