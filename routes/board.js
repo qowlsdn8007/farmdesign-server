@@ -5,7 +5,6 @@ var connection = dbc.init();
 const sens = require('node-sens');
 const multer = require('multer');
 const path = require('path');
-const sharp = require('sharp');
 
 dbc.test_open(connection);
 
