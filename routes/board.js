@@ -30,13 +30,8 @@ router.get('/info', function (req, res, next) {
     let input = [];
     for (i = 0; i < 5; i++)
         input[i] = req.query[inputarr[i]];
-    let token = "";
-    for (i = 0; i < 6; i++) 
-        token += parseInt(Math.random() * 10); 
-    input.push(token);
     input = [input];
     console.log(input);
-    let flag = " ";
    /* let sql = `SELECT * FROM farm_info WHERE USER_ID = ?`;
     connection.query(sql, [inputId],function(error, rows, fields) {
         if(!error) {
@@ -62,7 +57,7 @@ router.get('/info', function (req, res, next) {
         connection.query(sql, [input], function (error, rows, fields) {
             if (!error) {      
                 console.log(rows);
-                res.send(token);                   
+                res.send("success");                   
             } else {
                 console.log('query error : ' + error);
                 res.send("fail");
