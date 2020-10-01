@@ -32,27 +32,6 @@ router.get('/info', function (req, res, next) {
         input[i] = req.query[inputarr[i]];
     input = [input];
     console.log(input);
-   /* let sql = `SELECT * FROM farm_info WHERE USER_ID = ?`;
-    connection.query(sql, [inputId],function(error, rows, fields) {
-        if(!error) {
-            console.log(rows.length);
-            if(rows.lenth ==! 0) {
-                console.log("ASDF");
-                console.log(inputId);
-                res.send("idExist");  // 아이디가 존재
-                flag = "no";
-                console.log(flag);
-            }
-            else {
-                flag = "ok";
-                console.log("미존재");
-            }
-        }
-        else {
-            console.log(error);
-        }
-    })*/
-    //if (flag === "ok") {
         let sql = "INSERT INTO farm_info (FARM_NM, USER_ID, PASSWD, CITY_NM, FARM_ADDR) VALUES ?";
         connection.query(sql, [input], function (error, rows, fields) {
             if (!error) {      
@@ -94,7 +73,26 @@ router.get('/login', function (req, res, next) {
     });
 });
 
-//글 쓰기 페이지
+//아이디 중복 검사
+router.get('/duplication', function (req, res, next) {
+    let inputId = req.query['inputId'];
+    let sql = `SELECT * FROM farm_info WHERE USER_ID = ?`;
+    connection.query(sql, [inputId], function (error, rows, fields) {
+        if (!error) {
+            console.log(rows)
+            console.log(rows.length)
+            if(rows.length === 0)
+                res.send('success');
+            else
+                res.send('fail')  
+        } else {
+            console.log(error);
+        }
+    });
+});
+
+
+//문자 인증
  router.get('/sms', async function (req, res, next) {
     let phonenum = req.query['phonenum'];
     let authnum = "";
@@ -117,7 +115,7 @@ router.get('/login', function (req, res, next) {
     res.send(authnum); // 어플로 수신번호 보내기  인증 확인 위해서   
 });
 
-//글 쓰기 처리
+//사진 업로드
 router.post('/upload', upload.single('img'), function (req, res, next) {
 
     console.log(req);
@@ -144,7 +142,7 @@ router.get('/profile', function (req, res, next) {
         }        
     });
 });
-//글 삭제 처리
+//게시판 데이터
 router.get('/getBoardUsers', function (req, res, next) {
     let sql = `SELECT * FROM farm_Community`;
     connection.query(sql, function (error, rows, fields) {
@@ -158,9 +156,6 @@ router.get('/getBoardImages', function (req, res, next) {
         console.log(rows);
         res.send(rows);
     });
-});
-router.get('/deleteProc/:id', function (req, res, next) {
-    res.send(`board id : ${req.params.id}`);
 });
 
 module.exports = router;
